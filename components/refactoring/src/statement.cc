@@ -70,20 +70,23 @@ namespace TheaterBilling
             result << std::fixed << std::setprecision(2.0) << std::setfill('0') << value;
             return result.str();
         };
+        auto playFor = [&plays](const auto& aPerformance) -> const auto & 
+        {
+            return plays.at(aPerformance.playId());
+        };
 
         for (const auto &perf : invoice.performances())
         {
-            const auto play = plays.at(perf.playId());
-            auto thisAmount = amountFor(perf, play);
+            auto thisAmount = amountFor(perf, playFor(perf));
 
             // add volume credits
             volumeCredits += std::max(perf.audience() - 30, 0);
             // add extra credit for every ten comedy attendees
-            if (Play::Type::Comedy == play.type())
+            if (Play::Type::Comedy == playFor(perf).type())
                 volumeCredits += std::floor(static_cast<double>(perf.audience()) / 5.0);
 
             // print line for this order
-            result << " " << play.name() << ": $" << format(static_cast<double>(thisAmount) / 100.0) << " (" << perf.audience() << " seats)" << std::endl;
+            result << " " << playFor(perf).name() << ": $" << format(static_cast<double>(thisAmount) / 100.0) << " (" << perf.audience() << " seats)" << std::endl;
             totalAmount += thisAmount;
         }
 
