@@ -22,7 +22,7 @@ namespace TheaterBilling
         }
     };
 
-    int amountFor(const Performance &perf, const Play &play)
+    int amountFor(const Performance &aPerformance, const Play &play)
     {
         auto result = int(0);
 
@@ -31,20 +31,20 @@ namespace TheaterBilling
         case Play::Type::Tragedy:
         {
             result = 40000;
-            if (perf.audience() > 30)
+            if (aPerformance.audience() > 30)
             {
-                result += 1000 * (perf.audience() - 30);
+                result += 1000 * (aPerformance.audience() - 30);
             }
             break;
         }
         case Play::Type::Comedy:
         {
             result = 30000;
-            if (perf.audience() > 20)
+            if (aPerformance.audience() > 20)
             {
-                result += 10000 + 500 * (perf.audience() - 20);
+                result += 10000 + 500 * (aPerformance.audience() - 20);
             }
-            result += 300 * perf.audience();
+            result += 300 * aPerformance.audience();
             break;
         }
         case Play::Type::Invalid:
