@@ -1,0 +1,1 @@
+A c++ example for the refactoring example on chapter one of Martin Fowlers' Refactoring book
