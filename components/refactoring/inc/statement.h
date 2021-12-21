@@ -2,13 +2,13 @@
 
 #include <string>
 #include "plays.h"
+#include "invoice.h"
 
 
 namespace TheaterBilling
 {
 
-using Invoices = int;
-std::string statement(const Plays& plays, const Invoices& invoices);
+std::string statement(const Plays& plays, const Invoice& invoices);
 
 } // namespace TheaterBilling
 
