@@ -22,40 +22,6 @@ namespace TheaterBilling
         }
     };
 
-    int amountFor(const Performance &aPerformance, const Play &play)
-    {
-        auto result = int(0);
-
-        switch (play.type())
-        {
-        case Play::Type::Tragedy:
-        {
-            result = 40000;
-            if (aPerformance.audience() > 30)
-            {
-                result += 1000 * (aPerformance.audience() - 30);
-            }
-            break;
-        }
-        case Play::Type::Comedy:
-        {
-            result = 30000;
-            if (aPerformance.audience() > 20)
-            {
-                result += 10000 + 500 * (aPerformance.audience() - 20);
-            }
-            result += 300 * aPerformance.audience();
-            break;
-        }
-        case Play::Type::Invalid:
-            throw std::runtime_error("All performances need a valid play type.");
-        default:
-            throw std::runtime_error("Unsupported play type in invoice generation.");
-        }
-
-        return result;
-    }
-
     std::string statement(const Plays &plays, const Invoice &invoice)
     {
         auto totalAmount = int(0);
@@ -70,9 +36,42 @@ namespace TheaterBilling
             result << std::fixed << std::setprecision(2.0) << std::setfill('0') << value;
             return result.str();
         };
-        auto playFor = [&plays](const auto& aPerformance) -> const auto & 
+        auto playFor = [&plays](const auto &aPerformance) -> const auto &
         {
             return plays.at(aPerformance.playId());
+        };
+        auto amountFor = [](const Performance &aPerformance, const Play &play)
+        {
+            auto result = int(0);
+
+            switch (play.type())
+            {
+            case Play::Type::Tragedy:
+            {
+                result = 40000;
+                if (aPerformance.audience() > 30)
+                {
+                    result += 1000 * (aPerformance.audience() - 30);
+                }
+                break;
+            }
+            case Play::Type::Comedy:
+            {
+                result = 30000;
+                if (aPerformance.audience() > 20)
+                {
+                    result += 10000 + 500 * (aPerformance.audience() - 20);
+                }
+                result += 300 * aPerformance.audience();
+                break;
+            }
+            case Play::Type::Invalid:
+                throw std::runtime_error("All performances need a valid play type.");
+            default:
+                throw std::runtime_error("Unsupported play type in invoice generation.");
+            }
+
+            return result;
         };
 
         for (const auto &perf : invoice.performances())
