@@ -76,8 +76,6 @@ namespace TheaterBilling
 
         for (const auto &perf : invoice.performances())
         {
-            auto thisAmount = amountFor(perf);
-
             // add volume credits
             volumeCredits += std::max(perf.audience() - 30, 0);
             // add extra credit for every ten comedy attendees
@@ -85,8 +83,8 @@ namespace TheaterBilling
                 volumeCredits += std::floor(static_cast<double>(perf.audience()) / 5.0);
 
             // print line for this order
-            result << " " << playFor(perf).name() << ": $" << format(static_cast<double>(thisAmount) / 100.0) << " (" << perf.audience() << " seats)" << std::endl;
-            totalAmount += thisAmount;
+            result << " " << playFor(perf).name() << ": $" << format(static_cast<double>(amountFor(perf)) / 100.0) << " (" << perf.audience() << " seats)" << std::endl;
+            totalAmount += amountFor(perf);
         }
 
         result << "Amount owed is $" << format(static_cast<double>(totalAmount) / 100.0) << std::endl;
