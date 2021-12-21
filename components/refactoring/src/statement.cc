@@ -24,12 +24,12 @@ namespace TheaterBilling
 
     std::string statement(const Plays &plays, const Invoice &invoice)
     {
-        auto format = [](double value) -> auto
+        auto usd = [](int value) -> auto
         {
             auto result = std::stringstream();
             std::locale comma_locale(std::locale(), new comma_numpunct());
             result.imbue(comma_locale);
-            result << std::fixed << std::setprecision(2.0) << std::setfill('0') << value;
+            result << std::fixed << std::setprecision(2.0) << std::setfill('0') << (static_cast<double>(value) / 100.0);
             return result.str();
         };
         auto playFor = [&plays](const auto &aPerformance) -> const auto &
@@ -69,7 +69,16 @@ namespace TheaterBilling
 
             return result;
         };
-        
+
+        auto volumeCreditsFor = [&playFor](const auto& aPerformance) -> auto
+        {
+            auto result = int(0);
+            result += std::max(aPerformance.audience() - 30, 0);
+            if (Play::Type::Comedy == playFor(aPerformance).type())
+                result += std::floor(static_cast<double>(aPerformance.audience()) / 5.0);
+            return result;
+        };
+
         auto totalAmount = int(0);
         auto volumeCredits = int(0);
         auto result = std::stringstream();
@@ -77,18 +86,14 @@ namespace TheaterBilling
 
         for (const auto &perf : invoice.performances())
         {
-            // add volume credits
-            volumeCredits += std::max(perf.audience() - 30, 0);
-            // add extra credit for every ten comedy attendees
-            if (Play::Type::Comedy == playFor(perf).type())
-                volumeCredits += std::floor(static_cast<double>(perf.audience()) / 5.0);
+            volumeCredits += volumeCreditsFor(perf);
 
             // print line for this order
-            result << " " << playFor(perf).name() << ": $" << format(static_cast<double>(amountFor(perf)) / 100.0) << " (" << perf.audience() << " seats)" << std::endl;
+            result << " " << playFor(perf).name() << ": $" << usd(amountFor(perf)) << " (" << perf.audience() << " seats)" << std::endl;
             totalAmount += amountFor(perf);
         }
 
-        result << "Amount owed is $" << format(static_cast<double>(totalAmount) / 100.0) << std::endl;
+        result << "Amount owed is $" << usd(totalAmount) << std::endl;
         result << "You earned " << volumeCredits << " credits" << std::endl;
 
         return result.str();
