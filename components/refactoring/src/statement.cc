@@ -24,10 +24,6 @@ namespace TheaterBilling
 
     std::string statement(const Plays &plays, const Invoice &invoice)
     {
-        auto totalAmount = int(0);
-        auto volumeCredits = int(0);
-        auto result = std::stringstream();
-        result << "Statement for " << invoice.customer() << std::endl;
         auto format = [](double value) -> auto
         {
             auto result = std::stringstream();
@@ -73,6 +69,11 @@ namespace TheaterBilling
 
             return result;
         };
+        
+        auto totalAmount = int(0);
+        auto volumeCredits = int(0);
+        auto result = std::stringstream();
+        result << "Statement for " << invoice.customer() << std::endl;
 
         for (const auto &perf : invoice.performances())
         {
