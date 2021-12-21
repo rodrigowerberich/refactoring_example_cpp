@@ -40,11 +40,11 @@ namespace TheaterBilling
         {
             return plays.at(aPerformance.playId());
         };
-        auto amountFor = [](const Performance &aPerformance, const Play &play)
+        auto amountFor = [&playFor](const Performance &aPerformance)
         {
             auto result = int(0);
 
-            switch (play.type())
+            switch (playFor(aPerformance).type())
             {
             case Play::Type::Tragedy:
             {
@@ -76,7 +76,7 @@ namespace TheaterBilling
 
         for (const auto &perf : invoice.performances())
         {
-            auto thisAmount = amountFor(perf, playFor(perf));
+            auto thisAmount = amountFor(perf);
 
             // add volume credits
             volumeCredits += std::max(perf.audience() - 30, 0);
