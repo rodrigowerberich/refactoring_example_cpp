@@ -24,27 +24,27 @@ namespace TheaterBilling
 
     int amountFor(const Performance &perf, const Play &play)
     {
-        auto thisAmount = int(0);
+        auto result = int(0);
 
         switch (play.type())
         {
         case Play::Type::Tragedy:
         {
-            thisAmount = 40000;
+            result = 40000;
             if (perf.audience() > 30)
             {
-                thisAmount += 1000 * (perf.audience() - 30);
+                result += 1000 * (perf.audience() - 30);
             }
             break;
         }
         case Play::Type::Comedy:
         {
-            thisAmount = 30000;
+            result = 30000;
             if (perf.audience() > 20)
             {
-                thisAmount += 10000 + 500 * (perf.audience() - 20);
+                result += 10000 + 500 * (perf.audience() - 20);
             }
-            thisAmount += 300 * perf.audience();
+            result += 300 * perf.audience();
             break;
         }
         case Play::Type::Invalid:
@@ -53,7 +53,7 @@ namespace TheaterBilling
             throw std::runtime_error("Unsupported play type in invoice generation.");
         }
 
-        return thisAmount;
+        return result;
     }
 
     std::string statement(const Plays &plays, const Invoice &invoice)
