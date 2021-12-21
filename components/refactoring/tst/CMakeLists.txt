@@ -13,5 +13,6 @@ ADD_TEST(NAME refactoring_tst COMMAND refactoring_tst)
 TARGET_LINK_LIBRARIES(refactoring_tst 
     PUBLIC 
         gtest
+        gmock
         refactoring
 )
