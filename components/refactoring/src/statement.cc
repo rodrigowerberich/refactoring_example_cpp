@@ -89,7 +89,7 @@ namespace TheaterBilling
             return result;
         };
 
-        auto banana = [&amountFor, &invoice]() -> auto
+        auto totalAmount = [&amountFor, &invoice]() -> auto
         {
             auto result = int(0);
             for (const auto &perf : invoice.performances())
@@ -108,9 +108,7 @@ namespace TheaterBilling
             result << " " << playFor(perf).name() << ": $" << usd(amountFor(perf)) << " (" << perf.audience() << " seats)" << std::endl;
         }
 
-        auto totalAmount = banana();
-
-        result << "Amount owed is $" << usd(totalAmount) << std::endl;
+        result << "Amount owed is $" << usd(totalAmount()) << std::endl;
         result << "You earned " << totalVolumeCredits() << " credits" << std::endl;
 
         return result.str();
