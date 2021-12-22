@@ -86,12 +86,16 @@ namespace TheaterBilling
 
         for (const auto &perf : invoice.performances())
         {
-            volumeCredits += volumeCreditsFor(perf);
-
             // print line for this order
             result << " " << playFor(perf).name() << ": $" << usd(amountFor(perf)) << " (" << perf.audience() << " seats)" << std::endl;
             totalAmount += amountFor(perf);
         }
+
+        for (const auto &perf : invoice.performances())
+        {
+            volumeCredits += volumeCreditsFor(perf);
+        }
+
 
         result << "Amount owed is $" << usd(totalAmount) << std::endl;
         result << "You earned " << volumeCredits << " credits" << std::endl;
