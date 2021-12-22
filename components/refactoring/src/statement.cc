@@ -81,12 +81,12 @@ namespace TheaterBilling
 
         auto totalVolumeCredits = [&volumeCreditsFor, &invoice]() -> auto
         {
-            auto volumeCredits = int(0);
+            auto result = int(0);
             for (const auto &perf : invoice.performances())
             {
-                volumeCredits += volumeCreditsFor(perf);
+                result += volumeCreditsFor(perf);
             }
-            return volumeCredits;
+            return result;
         };
 
         auto totalAmount = int(0);
@@ -100,10 +100,8 @@ namespace TheaterBilling
             totalAmount += amountFor(perf);
         }
 
-        auto volumeCredits = totalVolumeCredits();
-
         result << "Amount owed is $" << usd(totalAmount) << std::endl;
-        result << "You earned " << volumeCredits << " credits" << std::endl;
+        result << "You earned " << totalVolumeCredits() << " credits" << std::endl;
 
         return result.str();
     }
