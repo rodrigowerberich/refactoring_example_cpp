@@ -80,7 +80,6 @@ namespace TheaterBilling
         };
 
         auto totalAmount = int(0);
-        auto volumeCredits = int(0);
         auto result = std::stringstream();
         result << "Statement for " << invoice.customer() << std::endl;
 
@@ -91,6 +90,7 @@ namespace TheaterBilling
             totalAmount += amountFor(perf);
         }
 
+        auto volumeCredits = int(0);
         for (const auto &perf : invoice.performances())
         {
             volumeCredits += volumeCreditsFor(perf);
