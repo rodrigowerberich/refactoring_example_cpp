@@ -89,7 +89,6 @@ namespace TheaterBilling
             return result;
         };
 
-        auto totalAmount = int(0);
         auto result = std::stringstream();
         result << "Statement for " << invoice.customer() << std::endl;
 
@@ -97,8 +96,14 @@ namespace TheaterBilling
         {
             // print line for this order
             result << " " << playFor(perf).name() << ": $" << usd(amountFor(perf)) << " (" << perf.audience() << " seats)" << std::endl;
+        }
+
+        auto totalAmount = int(0);
+        for (const auto &perf : invoice.performances())
+        {
             totalAmount += amountFor(perf);
         }
+
 
         result << "Amount owed is $" << usd(totalAmount) << std::endl;
         result << "You earned " << totalVolumeCredits() << " credits" << std::endl;
