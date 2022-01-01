@@ -27,7 +27,10 @@ namespace TheaterBilling
     {
     public:
         PerformanceWithExtraData(): Performance{}{}
-        PerformanceWithExtraData(const Performance& _performance): Performance{_performance}{}
+        PerformanceWithExtraData(const Performance& _performance, const Play& _play): Performance{_performance}, m_play{_play}{}
+        const Play & play() const { return m_play; }
+    private:
+        Play m_play;
     };
 
 
@@ -57,11 +60,11 @@ namespace TheaterBilling
         {
             return plays.at(aPerformance.playId());
         };
-        auto amountFor = [&playFor](const Performance &aPerformance)
+        auto amountFor = [&playFor](const PerformanceWithExtraData &aPerformance)
         {
             auto result = int(0);
 
-            switch (playFor(aPerformance).type())
+            switch (aPerformance.play().type())
             {
             case Play::Type::Tragedy:
             {
@@ -95,7 +98,7 @@ namespace TheaterBilling
         {
             auto result = int(0);
             result += std::max(aPerformance.audience() - 30, 0);
-            if (Play::Type::Comedy == playFor(aPerformance).type())
+            if (Play::Type::Comedy == aPerformance.play().type())
                 result += std::floor(static_cast<double>(aPerformance.audience()) / 5.0);
             return result;
         };
@@ -126,7 +129,7 @@ namespace TheaterBilling
         for (const auto &perf : data.performances())
         {
             // print line for this order
-            result << " " << playFor(perf).name() << ": $" << usd(amountFor(perf)) << " (" << perf.audience() << " seats)" << std::endl;
+            result << " " << perf.play().name() << ": $" << usd(amountFor(perf)) << " (" << perf.audience() << " seats)" << std::endl;
         }
 
         result << "Amount owed is $" << usd(totalAmount()) << std::endl;
@@ -135,16 +138,27 @@ namespace TheaterBilling
         return result.str();
     }
 
-    PerformanceWithExtraData enrichPerformance(const Performance& aPerformance)
+    PerformanceWithExtraData enrichPerformance(const Performance& aPerformance, const Plays &plays)
     {
-        return aPerformance;
+        auto playFor = [&plays](const auto &aPerformance) -> const auto &
+        {
+            return plays.at(aPerformance.playId());
+        };
+
+        return {
+            aPerformance,
+            playFor(aPerformance)
+            };
     }
 
-    StatementData::Performances enrichPerformances(const Performances& performances)
+    StatementData::Performances enrichPerformances(const Performances& performances, const Plays &plays)
     {
         StatementData::Performances result;
         result.reserve(performances.size());
-        std::transform(performances.begin(), performances.end(), std::back_inserter(result), enrichPerformance);
+        for(const auto& performance: performances)
+        {
+            result.push_back(enrichPerformance(performance, plays));
+        }
         return result;
     }
 
@@ -153,7 +167,7 @@ namespace TheaterBilling
         auto statementData = StatementData 
         {
             invoice.customer(),
-            enrichPerformances(invoice.performances())
+            enrichPerformances(invoice.performances(), plays)
         };
         return renderPlainText(statementData, plays);
     }
