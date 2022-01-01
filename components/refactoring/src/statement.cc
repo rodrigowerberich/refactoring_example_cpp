@@ -24,6 +24,11 @@ namespace TheaterBilling
 
     class StatementData
     {
+    public:
+        StatementData(const std::string& _customer): m_customer{_customer}{}
+        const std::string& customer() const {return m_customer; }
+    private:
+        std::string m_customer;
     };
 
     std::string renderPlainText(const StatementData& data, const Invoice& invoice, const Plays & plays)
@@ -104,7 +109,7 @@ namespace TheaterBilling
         };
 
         auto result = std::stringstream();
-        result << "Statement for " << invoice.customer() << std::endl;
+        result << "Statement for " << data.customer() << std::endl;
 
         for (const auto &perf : invoice.performances())
         {
@@ -120,7 +125,9 @@ namespace TheaterBilling
 
     std::string statement(const Invoice &invoice, const Plays &plays)
     {
-        auto statementData = StatementData{};
+        auto statementData = StatementData{
+            invoice.customer()
+        };
         return renderPlainText(statementData, invoice, plays);
     }
 
