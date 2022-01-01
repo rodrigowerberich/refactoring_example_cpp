@@ -56,11 +56,7 @@ namespace TheaterBilling
             result << std::fixed << std::setprecision(2.0) << std::setfill('0') << (static_cast<double>(value) / 100.0);
             return result.str();
         };
-        auto playFor = [&plays](const auto &aPerformance) -> const auto &
-        {
-            return plays.at(aPerformance.playId());
-        };
-        auto amountFor = [&playFor](const PerformanceWithExtraData &aPerformance)
+        auto amountFor = [](const PerformanceWithExtraData &aPerformance)
         {
             auto result = int(0);
 
@@ -94,7 +90,7 @@ namespace TheaterBilling
             return result;
         };
 
-        auto volumeCreditsFor = [&playFor](const auto& aPerformance) -> auto
+        auto volumeCreditsFor = [](const auto& aPerformance) -> auto
         {
             auto result = int(0);
             result += std::max(aPerformance.audience() - 30, 0);
