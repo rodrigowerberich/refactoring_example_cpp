@@ -23,9 +23,18 @@ namespace TheaterBilling
         }
     };
 
+    class PerformanceWithExtraData: public Performance
+    {
+    public:
+        PerformanceWithExtraData(): Performance{}{}
+        PerformanceWithExtraData(const Performance& _performance): Performance{_performance}{}
+    };
+
+
     class StatementData
     {
     public:
+        using Performances=std::vector<PerformanceData>;
         StatementData(const std::string& _customer, const Performances& _performances): m_customer{_customer}, m_performances{_performances}{}
         const std::string& customer() const {return m_customer; }
         const Performances& performances() const { return m_performances; }
@@ -126,14 +135,14 @@ namespace TheaterBilling
         return result.str();
     }
 
-    Performance enrichPerformance(const Performance& aPerformance)
+    PerformanceWithExtraData enrichPerformance(const Performance& aPerformance)
     {
         return aPerformance;
     }
 
-    Performances enrichPerformances(const Performances& performances)
+    StatementData::Performances enrichPerformances(const Performances& performances)
     {
-        Performances result;
+        StatementData::Performances result;
         result.reserve(performances.size());
         std::transform(performances.begin(), performances.end(), std::back_inserter(result), enrichPerformance);
         return result;
