@@ -22,7 +22,7 @@ namespace TheaterBilling
         }
     };
 
-    std::string statement(const Plays &plays, const Invoice &invoice)
+    std::string renderPlainText(const Invoice& invoice, const Plays & plays)
     {
         auto usd = [](int value) -> auto
         {
@@ -114,4 +114,9 @@ namespace TheaterBilling
         return result.str();
     }
 
+    std::string statement(const Plays &plays, const Invoice &invoice)
+    {
+        return renderPlainText(invoice, plays);
+    }
+    
 } // namespace TheaterBilling
