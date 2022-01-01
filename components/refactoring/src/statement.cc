@@ -33,7 +33,7 @@ namespace TheaterBilling
         Performances m_performances;
     };
 
-    std::string renderPlainText(const StatementData& data, const Invoice& invoice, const Plays & plays)
+    std::string renderPlainText(const StatementData& data, const Plays & plays)
     {
         auto usd = [](int value) -> auto
         {
@@ -131,7 +131,7 @@ namespace TheaterBilling
             invoice.customer(),
             invoice.performances()
         };
-        return renderPlainText(statementData, invoice, plays);
+        return renderPlainText(statementData, plays);
     }
 
 } // namespace TheaterBilling
