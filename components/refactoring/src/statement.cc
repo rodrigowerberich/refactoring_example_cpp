@@ -134,16 +134,17 @@ namespace TheaterBilling
         return result.str();
     }
 
+    auto playFor(const Performance & aPerformance, const Plays &plays) -> const auto &
+    {
+        return plays.at(aPerformance.playId());
+    };
+
+
     PerformanceWithExtraData enrichPerformance(const Performance& aPerformance, const Plays &plays)
     {
-        auto playFor = [&plays](const auto &aPerformance) -> const auto &
-        {
-            return plays.at(aPerformance.playId());
-        };
-
         return {
             aPerformance,
-            playFor(aPerformance)
+            playFor(aPerformance, plays)
             };
     }
 
