@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <stdexcept>
 #include <cmath>
+#include <algorithm>
 
 namespace TheaterBilling
 {
@@ -125,11 +126,25 @@ namespace TheaterBilling
         return result.str();
     }
 
+    Performance enrichPerformance(const Performance& aPerformance)
+    {
+        return aPerformance;
+    }
+
+    Performances enrichPerformances(const Performances& performances)
+    {
+        Performances result;
+        result.reserve(performances.size());
+        std::transform(performances.begin(), performances.end(), std::back_inserter(result), enrichPerformance);
+        return result;
+    }
+
     std::string statement(const Invoice &invoice, const Plays &plays)
     {
-        auto statementData = StatementData{
+        auto statementData = StatementData 
+        {
             invoice.customer(),
-            invoice.performances()
+            enrichPerformances(invoice.performances())
         };
         return renderPlainText(statementData, plays);
     }
