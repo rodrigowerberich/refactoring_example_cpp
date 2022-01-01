@@ -114,9 +114,9 @@ namespace TheaterBilling
         return result.str();
     }
 
-    std::string statement(const Plays &plays, const Invoice &invoice)
+    std::string statement(const Invoice &invoice, const Plays &plays)
     {
         return renderPlainText(invoice, plays);
     }
-    
+
 } // namespace TheaterBilling

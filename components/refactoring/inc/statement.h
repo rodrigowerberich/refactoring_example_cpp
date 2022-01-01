@@ -8,7 +8,7 @@
 namespace TheaterBilling
 {
 
-std::string statement(const Plays& plays, const Invoice& invoices);
+std::string statement(const Invoice& invoices, const Plays& plays);
 
 } // namespace TheaterBilling
 

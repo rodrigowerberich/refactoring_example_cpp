@@ -40,7 +40,7 @@ std::tuple<Plays, Invoice> createTestData2(){
 TEST(RefactoringTst, DataSet1) {
     auto [plays, invoice] = createTestData1();
 
-    EXPECT_THAT(statement(plays, invoice), StrEq(
+    EXPECT_THAT(statement(invoice, plays), StrEq(
 R"(Statement for BigCo
  Hamlet: $650.00 (55 seats)
  As You Like It: $580.00 (35 seats)
@@ -53,7 +53,7 @@ You earned 47 credits
 TEST(RefactoringTst, DataSet2) {
     auto [plays, invoice] = createTestData2();
 
-    EXPECT_THAT(statement(plays, invoice), StrEq(
+    EXPECT_THAT(statement(invoice, plays), StrEq(
 R"(Statement for Small Company
  Death of a Salesman: $400.00 (10 seats)
  Uncle Vanya: $860.00 (70 seats)
