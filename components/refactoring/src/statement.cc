@@ -34,7 +34,7 @@ namespace TheaterBilling
     class StatementData
     {
     public:
-        using Performances=std::vector<PerformanceData>;
+        using Performances=std::vector<PerformanceWithExtraData>;
         StatementData(const std::string& _customer, const Performances& _performances): m_customer{_customer}, m_performances{_performances}{}
         const std::string& customer() const {return m_customer; }
         const Performances& performances() const { return m_performances; }
