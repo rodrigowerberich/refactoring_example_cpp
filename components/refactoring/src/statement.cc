@@ -22,6 +22,15 @@ namespace TheaterBilling
             return "\03";
         }
     };
+ 
+    auto usd(int value) -> auto
+    {
+        auto result = std::stringstream();
+        std::locale comma_locale(std::locale(), new comma_numpunct());
+        result.imbue(comma_locale);
+        result << std::fixed << std::setprecision(2.0) << std::setfill('0') << (static_cast<double>(value) / 100.0);
+        return result.str();
+    };
 
     class PerformanceWithExtraData: public Performance
     {
@@ -46,78 +55,71 @@ namespace TheaterBilling
         Performances m_performances;
     };
 
+    auto amountFor(const PerformanceWithExtraData &aPerformance)
+    {
+        auto result = int(0);
+
+        switch (aPerformance.play().type())
+        {
+        case Play::Type::Tragedy:
+        {
+            result = 40000;
+            if (aPerformance.audience() > 30)
+            {
+                result += 1000 * (aPerformance.audience() - 30);
+            }
+            break;
+        }
+        case Play::Type::Comedy:
+        {
+            result = 30000;
+            if (aPerformance.audience() > 20)
+            {
+                result += 10000 + 500 * (aPerformance.audience() - 20);
+            }
+            result += 300 * aPerformance.audience();
+            break;
+        }
+        case Play::Type::Invalid:
+            throw std::runtime_error("All performances need a valid play type.");
+        default:
+            throw std::runtime_error("Unsupported play type in invoice generation.");
+        }
+
+        return result;
+    };
+
+    auto volumeCreditsFor(const PerformanceWithExtraData& aPerformance) -> auto
+    {
+        auto result = int(0);
+        result += std::max(aPerformance.audience() - 30, 0);
+        if (Play::Type::Comedy == aPerformance.play().type())
+            result += std::floor(static_cast<double>(aPerformance.audience()) / 5.0);
+        return result;
+    };
+
+    auto totalVolumeCredits(const StatementData& data) -> auto
+    {
+        auto result = int(0);
+        for (const auto &perf : data.performances())
+        {
+            result += volumeCreditsFor(perf);
+        }
+        return result;
+    };
+
+    auto totalAmount(const StatementData& data) -> auto
+    {
+        auto result = int(0);
+        for (const auto &perf : data.performances())
+        {
+            result += amountFor(perf);
+        }
+        return result;
+    };
+
     std::string renderPlainText(const StatementData& data, const Plays & plays)
     {
-        auto usd = [](int value) -> auto
-        {
-            auto result = std::stringstream();
-            std::locale comma_locale(std::locale(), new comma_numpunct());
-            result.imbue(comma_locale);
-            result << std::fixed << std::setprecision(2.0) << std::setfill('0') << (static_cast<double>(value) / 100.0);
-            return result.str();
-        };
-        auto amountFor = [](const PerformanceWithExtraData &aPerformance)
-        {
-            auto result = int(0);
-
-            switch (aPerformance.play().type())
-            {
-            case Play::Type::Tragedy:
-            {
-                result = 40000;
-                if (aPerformance.audience() > 30)
-                {
-                    result += 1000 * (aPerformance.audience() - 30);
-                }
-                break;
-            }
-            case Play::Type::Comedy:
-            {
-                result = 30000;
-                if (aPerformance.audience() > 20)
-                {
-                    result += 10000 + 500 * (aPerformance.audience() - 20);
-                }
-                result += 300 * aPerformance.audience();
-                break;
-            }
-            case Play::Type::Invalid:
-                throw std::runtime_error("All performances need a valid play type.");
-            default:
-                throw std::runtime_error("Unsupported play type in invoice generation.");
-            }
-
-            return result;
-        };
-
-        auto volumeCreditsFor = [](const auto& aPerformance) -> auto
-        {
-            auto result = int(0);
-            result += std::max(aPerformance.audience() - 30, 0);
-            if (Play::Type::Comedy == aPerformance.play().type())
-                result += std::floor(static_cast<double>(aPerformance.audience()) / 5.0);
-            return result;
-        };
-
-        auto totalVolumeCredits = [&volumeCreditsFor, &data]() -> auto
-        {
-            auto result = int(0);
-            for (const auto &perf : data.performances())
-            {
-                result += volumeCreditsFor(perf);
-            }
-            return result;
-        };
-
-        auto totalAmount = [&amountFor, &data]() -> auto
-        {
-            auto result = int(0);
-            for (const auto &perf : data.performances())
-            {
-                result += amountFor(perf);
-            }
-            return result;
-        };
 
         auto result = std::stringstream();
         result << "Statement for " << data.customer() << std::endl;
@@ -128,8 +130,8 @@ namespace TheaterBilling
             result << " " << perf.play().name() << ": $" << usd(amountFor(perf)) << " (" << perf.audience() << " seats)" << std::endl;
         }
 
-        result << "Amount owed is $" << usd(totalAmount()) << std::endl;
-        result << "You earned " << totalVolumeCredits() << " credits" << std::endl;
+        result << "Amount owed is $" << usd(totalAmount(data)) << std::endl;
+        result << "You earned " << totalVolumeCredits(data) << " credits" << std::endl;
 
         return result.str();
     }
