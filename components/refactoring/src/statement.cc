@@ -25,10 +25,12 @@ namespace TheaterBilling
     class StatementData
     {
     public:
-        StatementData(const std::string& _customer): m_customer{_customer}{}
+        StatementData(const std::string& _customer, const Performances& _performances): m_customer{_customer}, m_performances{_performances}{}
         const std::string& customer() const {return m_customer; }
+        const Performances& performances() const { return m_performances; }
     private:
         std::string m_customer;
+        Performances m_performances;
     };
 
     std::string renderPlainText(const StatementData& data, const Invoice& invoice, const Plays & plays)
@@ -88,20 +90,20 @@ namespace TheaterBilling
             return result;
         };
 
-        auto totalVolumeCredits = [&volumeCreditsFor, &invoice]() -> auto
+        auto totalVolumeCredits = [&volumeCreditsFor, &data]() -> auto
         {
             auto result = int(0);
-            for (const auto &perf : invoice.performances())
+            for (const auto &perf : data.performances())
             {
                 result += volumeCreditsFor(perf);
             }
             return result;
         };
 
-        auto totalAmount = [&amountFor, &invoice]() -> auto
+        auto totalAmount = [&amountFor, &data]() -> auto
         {
             auto result = int(0);
-            for (const auto &perf : invoice.performances())
+            for (const auto &perf : data.performances())
             {
                 result += amountFor(perf);
             }
@@ -111,7 +113,7 @@ namespace TheaterBilling
         auto result = std::stringstream();
         result << "Statement for " << data.customer() << std::endl;
 
-        for (const auto &perf : invoice.performances())
+        for (const auto &perf : data.performances())
         {
             // print line for this order
             result << " " << playFor(perf).name() << ": $" << usd(amountFor(perf)) << " (" << perf.audience() << " seats)" << std::endl;
@@ -126,7 +128,8 @@ namespace TheaterBilling
     std::string statement(const Invoice &invoice, const Plays &plays)
     {
         auto statementData = StatementData{
-            invoice.customer()
+            invoice.customer(),
+            invoice.performances()
         };
         return renderPlainText(statementData, invoice, plays);
     }
